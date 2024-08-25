@@ -1,6 +1,6 @@
 <h2 align="center">
  <br>
- <img src="https://i.imgur.com/f1C7EdN.png" alt="AI StockBot Powered by Groq with Tool Use and Generative UI" width="250">
+ <img src="https://i.imgur.com/h1NLJRN.jpeg" alt="AI StockBot Powered by Groq with Tool Use and Generative UI">
  <br>
  <br>
  StockBot Powered by Groq: Lightning Fast AI Chatbot that Responds With Live Interactive Stock Charts, Financials, News, Screeners, and More 
