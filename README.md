@@ -11,8 +11,7 @@
  <a href="#Overview">Overview</a> •
  <a href="#Features">Features</a> •
   <a href="#Interfaces">Interfaces</a> •
- <a href="#Quickstart">Quickstart</a> •
- <a href="#Credits">Credits</a>
+ <a href="#Quickstart">Quickstart</a> 
 </p>
 
 <br>
