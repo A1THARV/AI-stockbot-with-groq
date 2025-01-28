@@ -51,7 +51,7 @@ StockBot is an AI-powered chatbot that leverages Llama3 70b on Groq, Vercel’s 
 ## Quickstart
 
 > [!IMPORTANT]
-> To use StockBot, you can use a hosted version at [groq-stockbot.vercel.app](https://stockbot.atrv.tech/).
+> To use StockBot, you can use a hosted version at [stockbot.atrv.tech](https://stockbot.atrv.tech/).
 > Alternatively, you can run StockBot locally using the quickstart instructions.
 
 
