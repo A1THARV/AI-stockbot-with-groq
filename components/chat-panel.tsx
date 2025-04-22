@@ -3,7 +3,13 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { PromptForm } from '@/components/prompt-form'
 import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom'
-import { IconShare } from '@/components/ui/icons'
+import { IconShare, IconDownload } from '@/components/ui/icons'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
 import { FooterText } from '@/components/footer'
 import { useAIState, useActions, useUIState } from 'ai/rsc'
 import type { AI } from '@/lib/chat/actions'
@@ -79,6 +85,32 @@ export function ChatPanel({
     setRandExamples(shuffledExamples)
   }, [])
 
+  const handleExportChat = () => {
+    if (aiState.messages.length === 0) {
+      // TODO: Optionally show a toast notification here
+      console.log('No messages to export.')
+      return
+    }
+
+    try {
+      const jsonString = JSON.stringify(aiState.messages, null, 2)
+      const blob = new Blob([jsonString], { type: 'application/json' })
+      const downloadUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      // Use chat ID if available, otherwise use a generic name
+      const fileName = `chat-export-${aiState.chatId || 'history'}.json`
+      link.download = fileName
+      document.body.appendChild(link) // Required for Firefox
+      link.click()
+      document.body.removeChild(link) // Clean up
+      URL.revokeObjectURL(downloadUrl)
+    } catch (error) {
+      console.error('Error exporting chat:', error)
+      // TODO: Optionally show an error toast notification
+    }
+  }
+
   return (
     <div className="fixed inset-x-0 bottom-0 w-full bg-gradient-to-b from-muted/30 from-0% to-muted/30 to-50% duration-300 ease-in-out animate-in dark:from-background/10 dark:from-10% dark:to-background/80 peer-[[data-state=open]]:group-[]:lg:pl-[250px] peer-[[data-state=open]]:group-[]:xl:pl-[300px]">
       <ButtonScrollToBottom
@@ -124,7 +156,24 @@ export function ChatPanel({
             ))}
         </div>
 
-        <div className="space-y-4 border-t bg-background px-4 py-2 shadow-lg sm:border md:py-4">
+        <div className="relative flex h-auto flex-col items-center justify-center space-y-4 border-t bg-background px-4 py-2 shadow-lg sm:border md:py-4">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-4 top-[-40px] sm:right-8"
+                  onClick={handleExportChat}
+                  disabled={aiState.messages.length === 0} // Disable button if no messages
+                >
+                  <IconDownload />
+                  <span className="sr-only">Export Chat</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Export Chat</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <PromptForm input={input} setInput={setInput} />
           <FooterText className="hidden sm:block" />
         </div>
