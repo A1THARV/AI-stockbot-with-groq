@@ -15,15 +15,10 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip'
 import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
-import { cn } from '@/lib/utils' // Import cn for conditional classes
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
-import { useVoiceInput } from '@/lib/hooks/use-voice-input'; // Import the hook
-// Import Stop icon and Plus (as Mic placeholder)
-import { IconStop, IconPlus } from '@/components/ui/icons'; 
 
-import { useLocalStorage } from '@/lib/hooks/use-local-storage';
-import { toast } from 'sonner'; // Import toast
+import { useLocalStorage } from '@/lib/hooks/use-local-storage'
 
 export function PromptForm({
   input,
@@ -38,52 +33,7 @@ export function PromptForm({
   const { submitUserMessage } = useActions()
   const [_, setMessages] = useUIState<typeof AI>()
   const [apiKey, setApiKey] = useLocalStorage('groqKey', '')
-  const {
-    isListening,
-    transcript,
-    startListening,
-    stopListening,
-    browserSupportsSpeechRecognition,
-    microphonePermissionGranted,
-    error // Get the error state
-  } = useVoiceInput();
-  const [prevIsListening, setPrevIsListening] = React.useState(isListening);
 
-  // Effect to update input with the final transcript when listening stops
-  React.useEffect(() => {
-    // Check if listening just stopped
-    if (prevIsListening && !isListening && transcript) {
-      setInput(prevInput => prevInput + (prevInput ? ' ' : '') + transcript); // Append transcript
-    }
-    // Update previous listening state for next render
-    setPrevIsListening(isListening);
-  }, [isListening, prevIsListening, transcript, setInput]);
-
-  // Effect to show toast notifications for errors
-  React.useEffect(() => {
-    if (error) {
-      // Check for specific permission error message
-      if (error.toLowerCase().includes('permission denied')) {
-        toast.error('Microphone access denied.', {
-          description: 'Please enable microphone access in your browser settings to use voice input.',
-          duration: 5000 // Show for longer
-        });
-      } else {
-        // Show generic error toast
-        toast.error('Voice Input Error', {
-          description: error,
-          duration: 4000
-        });
-      }
-      // Optionally, clear the error in the hook after showing the toast
-      // This requires modifying the hook to expose an error clearing function,
-      // or simply relying on the error state being reset on the next action (like startListening).
-      // For now, we won't clear it automatically.
-    }
-  }, [error]); // Run this effect when the error state changes
-
-
-  // Automatically focus the input on component mount
   React.useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus()
@@ -149,82 +99,19 @@ export function PromptForm({
           name="message"
           rows={1}
           value={input}
-          onChange={e => {
-             setInput(e.target.value);
-             // If user types manually while listening, maybe stop listening?
-             // if (isListening) {
-             //   stopListening();
-             // }
-          }}
+          onChange={e => setInput(e.target.value)}
         />
-        <div className="absolute right-0 top-[13px] flex items-center space-x-2 sm:right-4">
-          {/* Microphone Button - Conditionally render if supported */}
-          {browserSupportsSpeechRecognition && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                {/* Using IconPlus as placeholder for Mic icon */}
-                <Button
-                    type="button"
-                    size="icon"
-                    variant={"outline"} // Keep outline variant
-                    onClick={async () => {
-                      if (isListening) {
-                        stopListening();
-                      } else {
-                        await startListening(); // It's async
-                      }
-                    }}
-                    // Disable only if permission is explicitly denied (false). Null means not yet requested.
-                    disabled={microphonePermissionGranted === false}
-                    className={cn(
-                      'transition-colors duration-200',
-                      // Add a visual cue for listening state, e.g., red ring or background
-                      isListening ? 'ring-2 ring-red-500 bg-red-100 dark:bg-red-900' : '',
-                      // Dim if permission denied
-                      microphonePermissionGranted === false ? 'opacity-50 cursor-not-allowed' : ''
-                    )}
-                >
-                   {/* TODO: Replace IconPlus with a real Microphone icon when available */}
-                  {isListening ? <IconStop className="size-5 text-red-500" /> : <IconPlus className="size-5" />}
-                  <span className="sr-only">{isListening ? 'Stop listening' : 'Start listening'}</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {microphonePermissionGranted === false
-                  ? 'Microphone permission denied. Check browser settings.'
-                  : error // Display specific error from the hook
-                  ? error
-                  : isListening
-                  ? 'Stop listening'
-                  : 'Start listening'}
-              </TooltipContent>
-            </Tooltip>
-          )}
-          {/* Tooltip for browsers that don't support speech recognition */}
-          {!browserSupportsSpeechRecognition && (
-             <Tooltip>
-                <TooltipTrigger asChild>
-                    <div className="inline-flex items-center justify-center size-9 opacity-50 cursor-not-allowed border border-input bg-background shadow-sm rounded-md">
-                         {/* Using IconPlus as placeholder for Mic icon */}
-                        <IconPlus className="size-5" />
-                    </div>
-                </TooltipTrigger>
-                <TooltipContent>Voice input not supported by your browser</TooltipContent>
-             </Tooltip>
-          )}
-
-          {/* Submit Button */}
+        <div className="absolute right-0 top-[13px] sm:right-4">
           <Tooltip>
             <TooltipTrigger asChild>
-              {/* Disable submit while listening to prevent submitting partial transcript */}
-              <Button type="submit" size="icon" disabled={input === '' || isListening}>
+              <Button type="submit" size="icon" disabled={input === ''}>
                 <div className="rotate-180">
                   <IconArrowDown />
                 </div>
                 <span className="sr-only">Send message</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>{isListening ? 'Stop voice input before sending' : 'Send message'}</TooltipContent>
+            <TooltipContent>Send message</TooltipContent>
           </Tooltip>
         </div>
       </div>
