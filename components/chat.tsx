@@ -28,7 +28,9 @@ export function Chat({ id, className, session, missingKeys }: ChatProps) {
   const [messages] = useUIState()
   const [aiState] = useAIState()
 
-  const [_, setNewChatId] = useLocalStorage('newChatId', id)
+  // Get the setter function for saving messages to local storage
+  const [_, saveMessages] = useLocalStorage<Message[]>('chat_' + id, [])
+  const [__, setNewChatId] = useLocalStorage('newChatId', id) // Keep existing newChatId logic
 
   useEffect(() => {
     if (session?.user) {
@@ -45,6 +47,15 @@ export function Chat({ id, className, session, missingKeys }: ChatProps) {
     }
     console.log('Value: ', aiState.messages)
   }, [aiState.messages, router])
+
+  // Save messages to local storage whenever they change, but only if not empty
+  useEffect(() => {
+    // Check if aiState and messages exist and the messages array is not empty
+    if (aiState?.messages && aiState.messages.length > 0) {
+       saveMessages(aiState.messages)
+    }
+    // Do not save if messages are empty to avoid overwriting initial state or clearing storage unnecessarily
+  }, [aiState.messages, saveMessages, id]) // Dependencies include messages, the save function, and the chat ID
 
   useEffect(() => {
     setNewChatId(id)
