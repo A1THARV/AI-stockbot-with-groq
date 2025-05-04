@@ -3,7 +3,7 @@ import { GeistMono } from 'geist/font/mono'
 
 import '@/app/globals.css'
 import { cn } from '@/lib/utils'
-// import { ThemeToggle } from '@/components/theme-toggle'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Providers } from '@/components/providers'
 import { Header } from '@/components/header'
 import { Toaster } from '@/components/ui/sonner'
@@ -57,7 +57,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <Header />
             <main className="flex flex-col flex-1 bg-muted/50">{children}</main>
           </div>
-          {/* <ThemeToggle /> */}
+          <ThemeToggle />
         </Providers>
       </body>
     </html>
