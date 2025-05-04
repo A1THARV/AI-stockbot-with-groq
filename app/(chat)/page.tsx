@@ -1,6 +1,6 @@
 import { nanoid } from '@/lib/utils'
 import { Chat } from '@/components/chat'
-import { ChatProviderWrapper } from '@/components/chat-provider-wrapper'
+import { AI } from '@/lib/chat/actions'
 import { Session } from '@/lib/types'
 import { getMissingKeys } from '@/app/actions'
 
@@ -13,8 +13,8 @@ export default async function IndexPage() {
   const missingKeys = await getMissingKeys()
 
   return (
-    <ChatProviderWrapper chatId={id}>
+    <AI initialAIState={{ chatId: id, messages: [] }}>
       <Chat id={id} missingKeys={missingKeys} />
-    </ChatProviderWrapper>
+    </AI>
   )
 }

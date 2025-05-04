@@ -166,6 +166,22 @@ Besides the symbol, you cannot customize any of the screeners or graphics. Do no
   }
 }
 
+async function restoreChatHistory(messages: Message[]) {
+  'use server'
+
+  const aiState = getMutableAIState<typeof AI>()
+
+  // Update the AI state with the provided messages, replacing the existing ones.
+  // Ensure the chatId is preserved.
+  aiState.update({
+    chatId: aiState.get().chatId, // Keep the existing chatId
+    messages: messages           // Replace the messages array
+  })
+
+  // No UI update is needed here as this action primarily updates the AI state.
+  // The UI should react based on changes to the AI state.
+}
+
 async function submitUserMessage(content: string) {
   'use server'
 
@@ -840,7 +856,8 @@ Assistant (you): { "tool_call": { "id": "pending", "type": "function", "function
 
 export const AI = createAI<AIState, UIState>({
   actions: {
-    submitUserMessage
+    submitUserMessage,
+    restoreChatHistory // Add the new action here
   },
   initialUIState: [],
   initialAIState: { chatId: nanoid(), messages: [] }
